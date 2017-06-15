@@ -122,7 +122,6 @@ public class Demo {
 			System.out.println();
 		}
 		System.out.println();
-
 	}
 
 	// takes the 2D double array plate and double values and returns the 2D
