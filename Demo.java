@@ -1,6 +1,8 @@
 package demoPack;
 
 import java.util.Scanner;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Demo {
 
@@ -11,10 +13,14 @@ public class Demo {
 		Scanner input = new Scanner(System.in);
 
 		// default vals for if a user forgets a flag
-		double top = 0;
-		double bot = 0;
-		double left = 0;
-		double right = 0;
+		BigDecimal top = new BigDecimal("0");
+		top = top.setScale(2, RoundingMode.HALF_UP);
+		BigDecimal bot = new BigDecimal("0");
+		bot = bot.setScale(2, RoundingMode.HALF_UP);
+		BigDecimal left = new BigDecimal("0");
+		left = left.setScale(2, RoundingMode.HALF_UP);
+		BigDecimal right = new BigDecimal("0");
+		right = right.setScale(2, RoundingMode.HALF_UP);
 		int d = 3;
 		int x = 0;
 		String arg;
@@ -31,19 +37,23 @@ public class Demo {
 				d = Integer.parseInt(args[x++]);
 				break;
 			case "-t":
-				top = Double.parseDouble(args[x++]);
+				top = new BigDecimal(args[x++]);
+				top = top.setScale(2, RoundingMode.HALF_UP);
 				break;
 			case "-b":
-				bot = Double.parseDouble(args[x++]);
+				bot = new BigDecimal(args[x++]);
+				bot = bot.setScale(2, RoundingMode.HALF_UP);
 				break;
 			case "-l":
-				left = Double.parseDouble(args[x++]);
+				left = new BigDecimal(args[x++]);
+				left = left.setScale(2, RoundingMode.HALF_UP);
 				break;
 			case "-r":
-				right = Double.parseDouble(args[x++]);
+				right = new BigDecimal(args[x++]);
 				break;
 			case "-c":
 				COUNT = Integer.parseInt(args[x++]);
+				right = right.setScale(2, RoundingMode.HALF_UP);
 				break;
 			default:
 				System.err.println("ParseCmdLine: illegal option " + arg);
@@ -51,8 +61,8 @@ public class Demo {
 			}
 		}
 
-		double[][] oldPlate = new double[d + 2][d + 2];
-		double[][] newPlate = new double[d + 2][d + 2];
+		BigDecimal[][] oldPlate = new BigDecimal[d + 2][d + 2];
+		BigDecimal[][] newPlate = new BigDecimal[d + 2][d + 2];
 		// sets edge temperatures for plates
 		oldPlate = initialize(oldPlate, top, bot, left, right);
 		newPlate = initialize(newPlate, top, bot, left, right);
@@ -72,22 +82,27 @@ public class Demo {
 	// takes the double 2d arrays old and new and iterates through the
 	// temperature change
 	// prints final array of heat distribution
-	public static void iterator(double[][] oldPlate, double[][] newPlate) {
+	public static void iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate) {
 		int runs = 0;
 		int d = oldPlate.length - 2;
-		double[][] oldPlateCopy = new double[oldPlate.length][oldPlate.length];
+		BigDecimal four = new BigDecimal("4");
+		four = four.setScale(2, RoundingMode.HALF_UP);
+		BigDecimal[][] oldPlateCopy = new BigDecimal[oldPlate.length][oldPlate.length];
 		for (int k = 0; k < oldPlate.length; k++) {
 			for (int m = 0; m < oldPlate.length; m++) {
 				oldPlateCopy[k][m] = oldPlate[k][m];
 			}
 		}
-		// while the wanted num of iterations hasn't been reached, if a user entered a number OR temp isn't stable
+		// while the wanted num of iterations hasn't been reached, if a user
+		// entered a number OR temp isn't stable
 		while (!done(runs, oldPlateCopy, newPlate)) {
-			// for each point on the plate, average surrounding temps for new temp
+			// for each point on the plate, average surrounding temps for new
+			// temp
 			for (int i = 1; i <= d; i++) {
 				for (int j = 1; j <= d; j++) {
-					newPlate[i][j] = (oldPlate[i + 1][j] + oldPlate[i - 1][j] + oldPlate[i][j + 1] + oldPlate[i][j - 1])
-							/ 4.0;
+					newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i - 1][j]).add(oldPlate[i][j + 1])
+							.add(oldPlate[i][j - 1])).divide(four);
+					newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
 				}
 			}
 			runs++;
@@ -113,24 +128,43 @@ public class Demo {
 	// takes the 2D double array plate and double values and returns the 2D
 	// array
 	// with edge values in place
-	public static double[][] initialize(double[][] plate, double top, double bot, double left, double right) {
+	public static BigDecimal[][] initialize(BigDecimal[][] plate, BigDecimal top, BigDecimal bot, BigDecimal left,
+			BigDecimal right) {
+		BigDecimal two = new BigDecimal("2");
+		two = two.setScale(2, RoundingMode.HALF_UP);
 		for (int i = 0; i < plate.length; i++) {
 			plate[0][i] = top;
 			plate[plate.length - 1][i] = bot;
 			plate[i][0] = left;
 			plate[i][plate.length - 1] = right;
+			plate[0][i] = plate[0][i].setScale(2, RoundingMode.HALF_UP);
+			plate[plate.length - 1][i] = plate[plate.length - 1][i].setScale(2, RoundingMode.HALF_UP);
+			plate[i][0] = plate[i][0].setScale(2, RoundingMode.HALF_UP);
+			plate[i][plate.length - 1] = plate[i][plate.length - 1].setScale(2, RoundingMode.HALF_UP);
 		}
-		plate[0][0] = (top + left) / 2.0;
-		plate[0][plate.length - 1] = (top + right) / 2.0;
-		plate[plate.length - 1][0] = (bot + left) / 2.0;
-		plate[plate.length - 1][plate.length - 1] = (bot + right) / 2.0;
+		for (int i = 1; i < plate.length - 1; i++) {
+			for (int j = 1; j < plate.length - 1; j++) {
+				plate[i][j] = new BigDecimal("0");
+				plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
+			}
+		}
+
+		plate[0][0] = (top.add(left)).divide(two);
+		plate[0][plate.length - 1] = (top.add(right)).divide(two);
+		plate[plate.length - 1][0] = (bot.add(left)).divide(two);
+		plate[plate.length - 1][plate.length - 1] = (bot.add(right)).divide(two);
+		plate[0][0] = plate[0][0].setScale(2, RoundingMode.HALF_UP);
+		plate[0][plate.length - 1] = plate[0][plate.length - 1].setScale(2, RoundingMode.HALF_UP);
+		plate[plate.length - 1][0] = plate[plate.length - 1][0].setScale(2, RoundingMode.HALF_UP);
+		plate[plate.length - 1][plate.length - 1] = plate[plate.length - 1][plate.length - 1].setScale(2,
+				RoundingMode.HALF_UP);
 		return plate;
 
 	}
 
 	// takes the number of runs completed and returns true if equal to the
 	// number of runs wanted
-	public static boolean done(int runs, double[][] older, double[][] newer) {
+	public static boolean done(int runs, BigDecimal[][] older, BigDecimal[][] newer) {
 		boolean isDone = true;
 		if (COUNT != 0) {
 			if (runs != COUNT) {
@@ -153,10 +187,11 @@ public class Demo {
 
 	// takes 2 double arrays and replaces the value of "old" with the current
 	// values in "new"
-	public static double[][] swap(double[][] oldPlate, double[][] newPlate) {
+	public static BigDecimal[][] swap(BigDecimal[][] oldPlate, BigDecimal[][] newPlate) {
 		for (int i = 0; i < oldPlate.length; i++) {
 			for (int j = 0; j < oldPlate.length; j++) {
 				oldPlate[i][j] = newPlate[i][j];
+				oldPlate[i][j]=oldPlate[i][j].setScale(2, RoundingMode.HALF_UP);
 			}
 		}
 
