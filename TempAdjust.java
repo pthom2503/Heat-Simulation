@@ -3,7 +3,9 @@ package demoPack;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class TempAdjust {
+import javax.swing.JFrame;
+
+public class TempAdjust extends JFrame{
 	// takes the double 2d arrays old and new and iterates through the
 	// temperature change
 	// returns 2D BigDecimal array of final heat distribution
