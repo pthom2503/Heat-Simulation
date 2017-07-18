@@ -1,8 +1,11 @@
 package demoPack;
 
 import java.util.Scanner;
+import java.awt.GridLayout;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import javax.swing.*;
+
 
 public class Demo extends TempAdjust{
 
@@ -100,19 +103,25 @@ public class Demo extends TempAdjust{
 		BigDecimal[][] newPlate = new BigDecimal[d + 2][d + 2];
 		// sets edge temperatures for plates
 		oldPlate = initialize(oldPlate, top, bot, left, right);
-		newPlate = initialize(newPlate, top, bot, left, right);
+		BigDecimal[][] finalPlate = new BigDecimal[d + 2][d + 2]; 
+		finalPlate = initialize(newPlate, top, bot, left, right);
+		
+		finalPlate = iterator(oldPlate, newPlate, count);
 		// shows initial edge temperatures
-		for (int i = 0; i <= d + 1; i++) {
-			for (int j = 0; j <= d + 1; j++) {
-				System.out.print(oldPlate[i][j] + "\t");
+		JFrame frame = new JFrame("Heat simulation");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel grid = new JPanel();
+        grid.setLayout(new GridLayout(d, d));
+		for (int i = 1; i < d + 1; i++) {
+			for (int j = 1; j < d + 1; j++) {
+				grid.add(new JLabel(finalPlate[i][j] + "\t"));
 			}
-			System.out.println();
+			frame.add(grid);
+			 frame.pack();
+		        frame.setVisible(true);
+			
 		}
-		System.out.println();
-		// runs simulation
-		iterator(oldPlate, newPlate, count);
-
 	}
 
-
+	
 }

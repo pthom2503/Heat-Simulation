@@ -3,11 +3,13 @@ package demoPack;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class TempAdjust {
+import javax.swing.JFrame;
+
+public class TempAdjust extends JFrame{
 	// takes the double 2d arrays old and new and iterates through the
 	// temperature change
-	// prints final array of heat distribution
-	public static void iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count) {
+	// returns 2D BigDecimal array of final heat distribution
+	public static BigDecimal [][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count) {
 		int runs = 0;
 		int d = oldPlate.length - 2;
 		BigDecimal four = new BigDecimal("4");
@@ -39,15 +41,7 @@ public class TempAdjust {
 		}
 		oldPlate = swap(oldPlate, newPlate);
 	}
-
-	for (int i = 1; i <= d; i++) {
-		for (int j = 1; j <= d; j++) {
-			System.out.print(newPlate[i][j] + "\t");
-		}
-		System.out.println();
-	}
-	System.out.println();
-
+	return newPlate;
 }
 	
 	// takes the 2D double array plate and double values and returns the 2D
