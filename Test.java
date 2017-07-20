@@ -5,15 +5,11 @@ import java.math.RoundingMode;
 import javax.swing.*;
 import demoPack.TempAdjust;
 
-@SuppressWarnings("serial")
+
 public class Test extends TempAdjust implements ActionListener {
 	// Private variables of the GUI components
-	JTextField tField, bField, lField, rField, dField, iField;
+	JTextField tField, bField, lField, rField, dimField, countField;
 	JButton runButton;
-	JTextArea tArea;
-	JFormattedTextField formattedField;
-	JTextField tft, tfb, tfl, tfr;
-	JLabel tLab, bLab, lLab, rLab, dLab;
 	int d, count;
 	String defaultTemp = "0";
 
@@ -45,23 +41,23 @@ public class Test extends TempAdjust implements ActionListener {
 
 		// Dimensions (Row 5)
 		tfPanel.add(new JLabel("  Dimension: "));
-		dField = new JTextField(10);
-		tfPanel.add(dField);
+		dimField = new JTextField(10);
+		tfPanel.add(dimField);
 
 		// Number of runs to do (Row 6)
 		// if checkBox is enabled, will use number of runs given, else will run
 		// until temp stabilizes
-		iField = new JTextField(10);
+		countField = new JTextField(10);
 		JCheckBox checkBox = new JCheckBox("Use set number of runs", false);
 		checkBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					iField.setEnabled(true);
+					countField.setEnabled(true);
 
 				} else if (e.getStateChange() == ItemEvent.DESELECTED) {
-					iField.setEnabled(false);
-					iField.setText("");
+					countField.setEnabled(false);
+					countField.setText("");
 				}
 
 				validate();
@@ -70,7 +66,7 @@ public class Test extends TempAdjust implements ActionListener {
 		});
 
 		tfPanel.add(checkBox);
-		tfPanel.add(iField);
+		tfPanel.add(countField);
 
 		// button to run simulation with given data
 		runButton = new JButton("Run");
@@ -103,18 +99,18 @@ public class Test extends TempAdjust implements ActionListener {
 				} else
 					sRight = defaultTemp;
 
-				if (!dField.getText().equals("")) {
+				if (!dimField.getText().equals("")) {
 					try {
-						d = Integer.parseInt(dField.getText());
+						d = Integer.parseInt(dimField.getText());
 					} catch (Exception ex) {
 						d = 3;
 					}
 				} else
 					d = 3;
 
-				if (!iField.getText().equals("")) {
+				if (!countField.getText().equals("")) {
 					try {
-						count = Integer.parseInt(iField.getText());
+						count = Integer.parseInt(countField.getText());
 					} catch (Exception ex) {
 						count = 0;
 					}
