@@ -15,6 +15,7 @@ public class Test extends TempAdjust implements ActionListener {
 	JTextField tft, tfb, tfl, tfr;
 	JLabel tLab, bLab, lLab, rLab, dLab;
 	int d, count;
+	String defaultTemp = "0";
 
 	// Constructor to set up all the GUI components
 	public Test() {
@@ -51,7 +52,7 @@ public class Test extends TempAdjust implements ActionListener {
 		// if checkBox is enabled, will use number of runs given, else will run
 		// until temp stabilizes
 		iField = new JTextField(10);
-		JCheckBox checkBox = new JCheckBox("Use set number of runs", true);
+		JCheckBox checkBox = new JCheckBox("Use set number of runs", false);
 		checkBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -79,27 +80,28 @@ public class Test extends TempAdjust implements ActionListener {
 		runButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String sTop, sBot, sLeft, sRight, sDim;
+				String sTop, sBot, sLeft, sRight;
 				BigDecimal top, bot, left, right;
+				int red;
 
 				// adds default case in case the blanks are left empty
 				if (!tField.getText().equals("")) {
 					sTop = tField.getText();
 				} else
-					sTop = "0";
+					sTop = defaultTemp;
 				if (!bField.getText().equals("")) {
 					sBot = bField.getText();
 				} else
-					sBot = "0";
+					sBot = defaultTemp;
 				if (!lField.getText().equals("")) {
 					sLeft = lField.getText();
 				} else
-					sLeft = "0";
+					sLeft = defaultTemp;
 
 				if (!rField.getText().equals("")) {
 					sRight = rField.getText();
 				} else
-					sRight = "0";
+					sRight = defaultTemp;
 
 				if (!dField.getText().equals("")) {
 					try {
@@ -124,27 +126,27 @@ public class Test extends TempAdjust implements ActionListener {
 				try {
 					top = new BigDecimal(sTop);
 				} catch (Exception ex) {
-					sTop = "0";
+					sTop = defaultTemp;
 					top = new BigDecimal(sTop);
 				}
 
 				try {
 					bot = new BigDecimal(sBot);
 				} catch (Exception ex) {
-					sBot = "0";
+					sBot = defaultTemp;
 					bot = new BigDecimal(sBot);
 				}
 
 				try {
 					left = new BigDecimal(sLeft);
 				} catch (Exception ex) {
-					sLeft = "0";
+					sLeft = defaultTemp;
 					left = new BigDecimal(sLeft);
 				}
 				try {
 					right = new BigDecimal(sRight);
 				} catch (Exception ex) {
-					sLeft = "0";
+					sLeft = defaultTemp;
 					right = new BigDecimal(sRight);
 				}
 
@@ -168,13 +170,29 @@ public class Test extends TempAdjust implements ActionListener {
 
 				// final display frame
 				JFrame frame = new JFrame("Heat Distribution");
+				
 				JPanel grid = new JPanel();
 				grid.setLayout(new GridLayout(d, d));
 				for (int i = 1; i < d + 1; i++) {
 					for (int j = 1; j < d + 1; j++) {
-						grid.add(new JLabel(finalPlate[i][j] + "\t"));
+						JLabel pointData = new JLabel(finalPlate[i][j] + "\t");
+						
+						//sets the color gradient of the text based on the temperature
+						red = (int) (finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact()*2.55);
+						
+						//ensures the red value is within acceptable range
+						if(red>255){
+							red=255;
+						}
+						if(red<0){
+							red=0;
+						}
+						
+						pointData.setForeground(new Color(red, 0, 0));
+						grid.add(pointData);
 					}
-					frame.add(grid);
+					frame.setContentPane(grid);
+					frame.getContentPane().setBackground(Color.lightGray);
 					frame.pack();
 					frame.setVisible(true);
 
@@ -187,7 +205,6 @@ public class Test extends TempAdjust implements ActionListener {
 		Container cp = this.getContentPane();
 		cp.setLayout(new BorderLayout(5, 5));
 		cp.add(tfPanel, BorderLayout.NORTH);
-		// cp.add(tAreaScrollPane, BorderLayout.CENTER);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Heat Distribution Simultation");
