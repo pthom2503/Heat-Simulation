@@ -8,15 +8,15 @@ import demoPack.TempAdjust;
 
 public class Test extends TempAdjust implements ActionListener {
 	// Private variables of the GUI components
-	JTextField tField, bField, lField, rField, dimField, countField;
+	JTextField tField, bField, lField, rField, dimRowField, dimColField, countField;
 	JButton runButton;
-	int d, count;
+	int dRow, dCol, count;
 	String defaultTemp = "0";
 
 	// Constructor to set up all the GUI components
 	public Test() {
 		// JPanel for the text fields
-		JPanel tfPanel = new JPanel(new GridLayout(7, 2, 10, 2));
+		JPanel tfPanel = new JPanel(new GridLayout(8, 2, 10, 2));
 		tfPanel.setBorder(BorderFactory.createTitledBorder("Input Plate Information: "));
 
 		// Top temp (Row 1)
@@ -39,12 +39,17 @@ public class Test extends TempAdjust implements ActionListener {
 		rField = new JTextField(10);
 		tfPanel.add(rField);
 
-		// Dimensions (Row 5)
-		tfPanel.add(new JLabel("  Dimension: "));
-		dimField = new JTextField(10);
-		tfPanel.add(dimField);
+		// Rows (Row 5)
+		tfPanel.add(new JLabel("  Rows: "));
+		dimRowField = new JTextField(10);
+		tfPanel.add(dimRowField);
+		
+		// Columns (Row 6)
+				tfPanel.add(new JLabel("  Columns: "));
+				dimColField = new JTextField(10);
+				tfPanel.add(dimColField);
 
-		// Number of runs to do (Row 6)
+		// Number of runs to do (Row 7)
 		// if checkBox is enabled, will use number of runs given, else will run
 		// until temp stabilizes
 		countField = new JTextField(10);
@@ -99,15 +104,24 @@ public class Test extends TempAdjust implements ActionListener {
 				} else
 					sRight = defaultTemp;
 
-				if (!dimField.getText().equals("")) {
+				if (!dimRowField.getText().equals("")) {
 					try {
-						d = Integer.parseInt(dimField.getText());
+						dRow = Integer.parseInt(dimRowField.getText());
 					} catch (Exception ex) {
-						d = 3;
+						dRow = 3;
 					}
 				} else
-					d = 3;
+					dRow = 3;
 
+				if (!dimColField.getText().equals("")) {
+					try {
+						dCol = Integer.parseInt(dimColField.getText());
+					} catch (Exception ex) {
+						dCol = 3;
+					}
+				} else
+					dCol = 3;
+				
 				if (!countField.getText().equals("")) {
 					try {
 						count = Integer.parseInt(countField.getText());
@@ -154,11 +168,11 @@ public class Test extends TempAdjust implements ActionListener {
 				right = right.setScale(2, RoundingMode.HALF_UP);
 
 				// creates the plates
-				BigDecimal[][] oldPlate = new BigDecimal[d + 2][d + 2];
-				BigDecimal[][] newPlate = new BigDecimal[d + 2][d + 2];
+				BigDecimal[][] oldPlate = new BigDecimal[dRow + 2][dCol + 2];
+				BigDecimal[][] newPlate = new BigDecimal[dRow + 2][dCol + 2];
 				// sets edge temperatures for plates
 				oldPlate = initialize(oldPlate, top, bot, left, right);
-				BigDecimal[][] finalPlate = new BigDecimal[d + 2][d + 2];
+				BigDecimal[][] finalPlate = new BigDecimal[dRow + 2][dCol + 2];
 				// makes a final plate for display purposes
 				finalPlate = initialize(newPlate, top, bot, left, right);
 
@@ -168,9 +182,9 @@ public class Test extends TempAdjust implements ActionListener {
 				JFrame frame = new JFrame("Heat Distribution");
 				
 				JPanel grid = new JPanel();
-				grid.setLayout(new GridLayout(d, d));
-				for (int i = 1; i < d + 1; i++) {
-					for (int j = 1; j < d + 1; j++) {
+				grid.setLayout(new GridLayout(dRow, dCol));
+				for (int i = 1; i <= dRow; i++) {
+					for (int j = 1; j <= dCol; j++) {
 						JLabel pointData = new JLabel(finalPlate[i][j] + "\t");
 						
 						//sets the color gradient of the text based on the temperature
