@@ -11,12 +11,13 @@ public class TempAdjust extends JFrame {
 	// returns 2D BigDecimal array of final heat distribution
 	public static BigDecimal[][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count) {
 		int runs = 0;
-		int d = oldPlate.length - 2;
+		int dRows = oldPlate.length - 2;
+		int dCols = oldPlate[0].length - 2;
 		BigDecimal four = new BigDecimal("4");
 		four = four.setScale(2, RoundingMode.HALF_UP);
-		BigDecimal[][] oldPlateCopy = new BigDecimal[oldPlate.length][oldPlate.length];
+		BigDecimal[][] oldPlateCopy = new BigDecimal[oldPlate.length][oldPlate[0].length];
 		for (int k = 0; k < oldPlate.length; k++) {
-			for (int m = 0; m < oldPlate.length; m++) {
+			for (int m = 0; m < oldPlate[k].length; m++) {
 				oldPlateCopy[k][m] = oldPlate[k][m];
 			}
 		}
@@ -25,8 +26,8 @@ public class TempAdjust extends JFrame {
 		while (!done(runs, oldPlateCopy, newPlate, count)) {
 			// for each point on the plate, average surrounding temps for new
 			// temp
-			for (int i = 1; i <= d; i++) {
-				for (int j = 1; j <= d; j++) {
+			for (int i = 1; i <= dRows; i++) {
+				for (int j = 1; j <= dCols; j++) {
 					newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i - 1][j]).add(oldPlate[i][j + 1])
 							.add(oldPlate[i][j - 1])).divide(four);
 					newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
@@ -35,7 +36,7 @@ public class TempAdjust extends JFrame {
 			runs++;
 			// change new iteration of temps to the base (old)
 			for (int k = 0; k < oldPlate.length; k++) {
-				for (int m = 0; m < oldPlate.length; m++) {
+				for (int m = 0; m < oldPlate[k].length; m++) {
 					oldPlateCopy[k][m] = oldPlate[k][m];
 				}
 			}
@@ -51,18 +52,50 @@ public class TempAdjust extends JFrame {
 			BigDecimal right) {
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
+		int rows = plate.length;
+		int columns = plate[0].length;
+		
 		for (int i = 0; i < plate.length; i++) {
-			plate[0][i] = top;
-			plate[plate.length - 1][i] = bot;
-			plate[i][0] = left;
-			plate[i][plate.length - 1] = right;
-			plate[0][i] = plate[0][i].setScale(2, RoundingMode.HALF_UP);
-			plate[plate.length - 1][i] = plate[plate.length - 1][i].setScale(2, RoundingMode.HALF_UP);
-			plate[i][0] = plate[i][0].setScale(2, RoundingMode.HALF_UP);
-			plate[i][plate.length - 1] = plate[i][plate.length - 1].setScale(2, RoundingMode.HALF_UP);
+		      for (int j = 0; j < plate[i].length; j++) {
+		        if (i==0){
+		        	plate[i][j]=top;
+		        }
+		        else if(i == plate.length-1){
+		        		plate[i][j]=bot;
+		        	}
+		        else if(j == 0){
+		        plate[i][j]=left;	
+		        }
+		        	
+		        else
+		          plate[i][j] = right;
+		         
+		      plate[i][j]=plate[i][j].setScale(2, RoundingMode.HALF_UP);
+		      BigDecimal var1 = plate[i][j];
+		      }
 		}
+		
+		/*for (int i = 0; i < plate.length; i++) {
+			plate[i][0] = left;
+			
+			plate[i][columns - 1] = right;
+			BigDecimal var2 = plate[i][columns - 1];
+			plate[i][0] = plate[i][0].setScale(2, RoundingMode.HALF_UP);
+			plate[i][columns - 1] = plate[i][columns - 1].setScale(2, RoundingMode.HALF_UP);
+		}
+
+		for (int j = 0; j < plate[0].length; j++) {
+			plate[0][j] = top;
+			BigDecimal var3 = plate[0][j];
+			plate[rows - 1][j] = bot;
+			BigDecimal var4 = plate[rows - 1][j] = bot;
+			plate[0][j] = plate[0][j].setScale(2, RoundingMode.HALF_UP);
+			plate[rows - 1][j] = plate[rows - 1][j].setScale(2, RoundingMode.HALF_UP);
+
+		}
+		*/
 		for (int i = 1; i < plate.length - 1; i++) {
-			for (int j = 1; j < plate.length - 1; j++) {
+			for (int j = 1; j < plate[i].length - 1; j++) {
 				plate[i][j] = new BigDecimal("0");
 				plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
 			}
@@ -71,14 +104,13 @@ public class TempAdjust extends JFrame {
 		// at that corner
 
 		plate[0][0] = (top.add(left)).divide(two);
-		plate[0][plate.length - 1] = (top.add(right)).divide(two);
-		plate[plate.length - 1][0] = (bot.add(left)).divide(two);
-		plate[plate.length - 1][plate.length - 1] = (bot.add(right)).divide(two);
+		plate[0][columns - 1] = (top.add(right)).divide(two);
+		plate[rows - 1][0] = (bot.add(left)).divide(two);
+		plate[rows - 1][columns - 1] = (bot.add(right)).divide(two);
 		plate[0][0] = plate[0][0].setScale(2, RoundingMode.HALF_UP);
-		plate[0][plate.length - 1] = plate[0][plate.length - 1].setScale(2, RoundingMode.HALF_UP);
-		plate[plate.length - 1][0] = plate[plate.length - 1][0].setScale(2, RoundingMode.HALF_UP);
-		plate[plate.length - 1][plate.length - 1] = plate[plate.length - 1][plate.length - 1].setScale(2,
-				RoundingMode.HALF_UP);
+		plate[0][columns - 1] = plate[0][columns - 1].setScale(2, RoundingMode.HALF_UP);
+		plate[rows - 1][0] = plate[rows - 1][0].setScale(2, RoundingMode.HALF_UP);
+		plate[rows - 1][columns - 1] = plate[rows - 1][columns - 1].setScale(2, RoundingMode.HALF_UP);
 		return plate;
 
 	}
@@ -97,7 +129,7 @@ public class TempAdjust extends JFrame {
 			return isDone;
 		} else {
 			for (int k = 0; k < older.length; k++) {
-				for (int m = 0; m < older.length; m++) {
+				for (int m = 0; m < older[0].length; m++) {
 					if (!older[k][m].equals(newer[k][m]))
 						isDone = false;
 				}
@@ -110,7 +142,7 @@ public class TempAdjust extends JFrame {
 	// values in "new"
 	public static BigDecimal[][] swap(BigDecimal[][] oldPlate, BigDecimal[][] newPlate) {
 		for (int i = 0; i < oldPlate.length; i++) {
-			for (int j = 0; j < oldPlate.length; j++) {
+			for (int j = 0; j < oldPlate[i].length; j++) {
 				oldPlate[i][j] = newPlate[i][j];
 				oldPlate[i][j] = oldPlate[i][j].setScale(2, RoundingMode.HALF_UP);
 			}
