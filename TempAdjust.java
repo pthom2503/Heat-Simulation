@@ -11,8 +11,7 @@ public class TempAdjust extends JFrame {
 	// returns 2D BigDecimal array of final heat distribution
 	public static BigDecimal[][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count) {
 		int runs = 0;
-		int dRows = oldPlate.length - 2;
-		int dCols = oldPlate[0].length - 2;
+
 		BigDecimal four = new BigDecimal("4");
 		four = four.setScale(2, RoundingMode.HALF_UP);
 		BigDecimal[][] oldPlateCopy = new BigDecimal[oldPlate.length][oldPlate[0].length];
@@ -26,8 +25,8 @@ public class TempAdjust extends JFrame {
 		while (!done(runs, oldPlateCopy, newPlate, count)) {
 			// for each point on the plate, average surrounding temps for new
 			// temp
-			for (int i = 1; i <= dRows; i++) {
-				for (int j = 1; j <= dCols; j++) {
+			for (int i = 1; i <= oldPlate.length - 2; i++) {
+				for (int j = 1; j <= oldPlate[0].length - 2; j++) {
 					newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i - 1][j]).add(oldPlate[i][j + 1])
 							.add(oldPlate[i][j - 1])).divide(four);
 					newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
@@ -47,53 +46,33 @@ public class TempAdjust extends JFrame {
 
 	// takes the 2D double array plate and double values and returns the 2D
 	// array
-	// with edge values in place
+	// with edge values in place and 0 values in all other locations
 	public static BigDecimal[][] initialize(BigDecimal[][] plate, BigDecimal top, BigDecimal bot, BigDecimal left,
 			BigDecimal right) {
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
 		int rows = plate.length;
 		int columns = plate[0].length;
-		
+
 		for (int i = 0; i < plate.length; i++) {
-		      for (int j = 0; j < plate[i].length; j++) {
-		        if (i==0){
-		        	plate[i][j]=top;
-		        }
-		        else if(i == plate.length-1){
-		        		plate[i][j]=bot;
-		        	}
-		        else if(j == 0){
-		        plate[i][j]=left;	
-		        }
-		        	
-		        else
-		          plate[i][j] = right;
-		         
-		      plate[i][j]=plate[i][j].setScale(2, RoundingMode.HALF_UP);
-		      BigDecimal var1 = plate[i][j];
-		      }
+			for (int j = 0; j < plate[i].length; j++) {
+				if (i == 0) {
+					plate[i][j] = top;
+				} else if (i == plate.length - 1) {
+					plate[i][j] = bot;
+				} else if (j == 0) {
+					plate[i][j] = left;
+				}
+
+				else
+					plate[i][j] = right;
+
+				plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
+				BigDecimal var1 = plate[i][j];
+			}
 		}
 		
-		/*for (int i = 0; i < plate.length; i++) {
-			plate[i][0] = left;
-			
-			plate[i][columns - 1] = right;
-			BigDecimal var2 = plate[i][columns - 1];
-			plate[i][0] = plate[i][0].setScale(2, RoundingMode.HALF_UP);
-			plate[i][columns - 1] = plate[i][columns - 1].setScale(2, RoundingMode.HALF_UP);
-		}
-
-		for (int j = 0; j < plate[0].length; j++) {
-			plate[0][j] = top;
-			BigDecimal var3 = plate[0][j];
-			plate[rows - 1][j] = bot;
-			BigDecimal var4 = plate[rows - 1][j] = bot;
-			plate[0][j] = plate[0][j].setScale(2, RoundingMode.HALF_UP);
-			plate[rows - 1][j] = plate[rows - 1][j].setScale(2, RoundingMode.HALF_UP);
-
-		}
-		*/
+		//sets all interior values on the plate to 0
 		for (int i = 1; i < plate.length - 1; i++) {
 			for (int j = 1; j < plate[i].length - 1; j++) {
 				plate[i][j] = new BigDecimal("0");
