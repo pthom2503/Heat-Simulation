@@ -53,8 +53,8 @@ public class Test extends TempAdjust implements ActionListener {
 		// if checkBox is enabled, will use number of runs given, else will run
 		// until temp stabilizes
 		countField = new JTextField(10);
-		JCheckBox checkBox = new JCheckBox("Use set number of runs", false);
-		checkBox.addItemListener(new ItemListener() {
+		JCheckBox countCheckBox = new JCheckBox("Use set number of runs", false);
+		countCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -70,7 +70,7 @@ public class Test extends TempAdjust implements ActionListener {
 			}
 		});
 
-		tfPanel.add(checkBox);
+		tfPanel.add(countCheckBox);
 		tfPanel.add(countField);
 
 		// button to run simulation with given data
@@ -175,7 +175,7 @@ public class Test extends TempAdjust implements ActionListener {
 				BigDecimal[][] finalPlate = new BigDecimal[dRow + 2][dCol + 2];
 				// makes a final plate for display purposes
 				finalPlate = initialize(newPlate, top, bot, left, right);
-
+	
 				finalPlate = iterator(oldPlate, newPlate, count);
 
 				// final display frame
@@ -214,6 +214,8 @@ public class Test extends TempAdjust implements ActionListener {
 		// Setup the content-pane of JFrame in BorderLayout
 		Container cp = this.getContentPane();
 		cp.setLayout(new BorderLayout(5, 5));
+		
+		
 		cp.add(tfPanel, BorderLayout.NORTH);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
