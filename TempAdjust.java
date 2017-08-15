@@ -16,7 +16,6 @@ public class TempAdjust extends JFrame {
 		BigDecimal two = new BigDecimal("2");
 		BigDecimal three = new BigDecimal("3");
 		BigDecimal four = new BigDecimal("4");
-		long x;
 		two = two.setScale(2, RoundingMode.HALF_UP);
 		three = three.setScale(2, RoundingMode.HALF_UP);
 		four = four.setScale(2, RoundingMode.HALF_UP);
@@ -26,8 +25,6 @@ public class TempAdjust extends JFrame {
 				oldPlateCopy[k][m] = oldPlate[k][m];
 			}
 		}
-		boolean sideTriggered = false;
-		boolean cornerTriggered = false;
 		// while the wanted num of iterations hasn't been reached, if a user
 		// entered a number OR temp isn't stable
 
@@ -86,7 +83,6 @@ public class TempAdjust extends JFrame {
 								newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
 							}
 						}
-						x = newPlate[i][j].longValue();
 					}
 				}
 			}
@@ -110,8 +106,7 @@ public class TempAdjust extends JFrame {
 			BigDecimal right) {
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
-		int rows = plate.length;
-		int columns = plate[0].length;
+
 
 		for (int i = 0; i < plate.length; i++) {
 			for (int j = 0; j < plate[i].length; j++) {
@@ -142,13 +137,13 @@ public class TempAdjust extends JFrame {
 		// at that corner
 
 		plate[0][0] = (top.add(left)).divide(two);
-		plate[0][columns - 1] = (top.add(right)).divide(two);
-		plate[rows - 1][0] = (bot.add(left)).divide(two);
-		plate[rows - 1][columns - 1] = (bot.add(right)).divide(two);
+		plate[0][plate[0].length - 1] = (top.add(right)).divide(two);
+		plate[plate.length - 1][0] = (bot.add(left)).divide(two);
+		plate[plate.length - 1][plate[0].length - 1] = (bot.add(right)).divide(two);
 		plate[0][0] = plate[0][0].setScale(2, RoundingMode.HALF_UP);
-		plate[0][columns - 1] = plate[0][columns - 1].setScale(2, RoundingMode.HALF_UP);
-		plate[rows - 1][0] = plate[rows - 1][0].setScale(2, RoundingMode.HALF_UP);
-		plate[rows - 1][columns - 1] = plate[rows - 1][columns - 1].setScale(2, RoundingMode.HALF_UP);
+		plate[0][plate[0].length - 1] = plate[0][plate[0].length - 1].setScale(2, RoundingMode.HALF_UP);
+		plate[plate.length - 1][0] = plate[plate.length - 1][0].setScale(2, RoundingMode.HALF_UP);
+		plate[plate.length - 1][plate[0].length - 1] = plate[plate.length - 1][plate[0].length - 1].setScale(2, RoundingMode.HALF_UP);
 		return plate;
 
 	}
