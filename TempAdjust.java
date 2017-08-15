@@ -9,16 +9,16 @@ public class TempAdjust extends JFrame {
 	// takes the double 2d arrays old and new and iterates through the
 	// temperature change
 	// returns 2D BigDecimal array of final heat distribution
-	public static BigDecimal[][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count, boolean center) {
+	public static BigDecimal[][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count, boolean point,
+			int x, int y) {
 		int runs = 0;
-		int rowCent = oldPlate.length / 2;
-		int colCent = oldPlate[0].length / 2;
 		BigDecimal two = new BigDecimal("2");
 		BigDecimal three = new BigDecimal("3");
 		BigDecimal four = new BigDecimal("4");
 		two = two.setScale(2, RoundingMode.HALF_UP);
 		three = three.setScale(2, RoundingMode.HALF_UP);
 		four = four.setScale(2, RoundingMode.HALF_UP);
+		// makes acopy of the older version for later comparison
 		BigDecimal[][] oldPlateCopy = new BigDecimal[oldPlate.length][oldPlate[0].length];
 		for (int k = 0; k < oldPlate.length; k++) {
 			for (int m = 0; m < oldPlate[k].length; m++) {
@@ -30,9 +30,10 @@ public class TempAdjust extends JFrame {
 
 		while (!done(runs, oldPlateCopy, newPlate, count)) {
 			// for each point on the plate, average surrounding temps for
-			// new
-			// temp
-			if (!center) {
+			// new temp
+
+			// if the plate is being heated from the edges:
+			if (!point) {
 				for (int i = 1; i <= oldPlate.length - 2; i++) {
 					for (int j = 1; j <= oldPlate[0].length - 2; j++) {
 
@@ -42,11 +43,15 @@ public class TempAdjust extends JFrame {
 
 					}
 				}
+
+				// if the plate has a point heat source
 			} else {
 
 				for (int i = 0; i < oldPlate.length; i++) {
 					for (int j = 0; j < oldPlate[i].length; j++) {
-						if (i == rowCent && j == colCent) {
+						// don't adjust if it is the heat source
+						if (i == x && j == y) {
+							// sides cases
 						} else {
 							if (i == 0 && j != 0 && j != oldPlate[0].length - 1) {
 								newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i][j + 1]).add(oldPlate[i][j - 1]))
@@ -60,7 +65,7 @@ public class TempAdjust extends JFrame {
 							} else if (j == oldPlate[0].length - 1 && i != 0 && i != oldPlate.length - 1) {
 								newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i - 1][j]).add(oldPlate[i][j - 1]))
 										.divide(three, 2, RoundingMode.HALF_UP);
-
+								// corner cases
 							} else if (i == 0 && j == 0) {
 								newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i][j + 1])).divide(two);
 								newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
@@ -106,8 +111,7 @@ public class TempAdjust extends JFrame {
 			BigDecimal right) {
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
-
-
+		// edge heats
 		for (int i = 0; i < plate.length; i++) {
 			for (int j = 0; j < plate[i].length; j++) {
 				if (i == 0) {
@@ -143,16 +147,15 @@ public class TempAdjust extends JFrame {
 		plate[0][0] = plate[0][0].setScale(2, RoundingMode.HALF_UP);
 		plate[0][plate[0].length - 1] = plate[0][plate[0].length - 1].setScale(2, RoundingMode.HALF_UP);
 		plate[plate.length - 1][0] = plate[plate.length - 1][0].setScale(2, RoundingMode.HALF_UP);
-		plate[plate.length - 1][plate[0].length - 1] = plate[plate.length - 1][plate[0].length - 1].setScale(2, RoundingMode.HALF_UP);
+		plate[plate.length - 1][plate[0].length - 1] = plate[plate.length - 1][plate[0].length - 1].setScale(2,
+				RoundingMode.HALF_UP);
 		return plate;
 
 	}
 
-	public static BigDecimal[][] initializeCent(BigDecimal[][] plate, BigDecimal temp) {
+	public static BigDecimal[][] initializePoint(BigDecimal[][] plate, BigDecimal temp, int x, int y) {
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
-		int rows = plate.length;
-		int columns = plate[0].length;
 
 		// sets all interior values on the plate to 0
 		for (int i = 0; i < plate.length; i++) {
@@ -161,27 +164,26 @@ public class TempAdjust extends JFrame {
 				plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
 			}
 		}
-		// sets the corner temp values as the average of the two sides meeting
-		// at that corner
+		// sets the point heat source to the specified temp
 
-		plate[rows / 2][columns / 2] = temp;
-		plate[rows / 2][columns / 2] = plate[rows / 2][columns / 2].setScale(2, RoundingMode.HALF_UP);
+		plate[x][y] = temp;
+		plate[x][y] = plate[x][y].setScale(2, RoundingMode.HALF_UP);
 		return plate;
 
 	}
 
 	// takes the number of runs completed and returns true if equal to the
 	// number of runs wanted
+	// if num of runs not given by user initially, returns true if all points in
+	// the older and newer versions of the plate are equal (to 2 decimal places)
 	public static boolean done(int runs, BigDecimal[][] older, BigDecimal[][] newer, int count) {
 		boolean isDone = true;
 		if (count != 0) {
 			if (runs != count) {
-				isDone = false;
-				return isDone;
+				isDone = false;			
 			}
 		} else if (runs <= 1) {
 			isDone = false;
-			return isDone;
 		} else {
 			for (int k = 0; k < older.length; k++) {
 				for (int m = 0; m < older[0].length; m++) {
