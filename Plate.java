@@ -198,8 +198,6 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 			} else
 				sTop = defaultTemp;
 
-			if (!center) {
-
 				if (!bField.getText().equals("")) {
 
 					sBot = bField.getText();
@@ -215,7 +213,14 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 					sRight = rField.getText();
 				} else
 					sRight = defaultTemp;
-			}
+				if (!countField.getText().equals("")) {
+					try {
+						count = Integer.parseInt(countField.getText());
+					} catch (Exception ex) {
+						count = 0;
+					}
+				} else
+					count = 0;
 		}
 
 		else {
@@ -223,6 +228,15 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 				sTemp = tempField.getText();
 			} else
 				sTemp = defaultTemp;
+			
+			if (!countFieldCent.getText().equals("")) {
+				try {
+					count = Integer.parseInt(countFieldCent.getText());
+				} catch (Exception ex) {
+					count = 0;
+				}
+			} else
+				count = 0;
 		}
 
 		if (!dimRowField.getText().equals(""))
@@ -245,14 +259,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		} else
 			dCol = 3;
 
-		if (!countField.getText().equals("")) {
-			try {
-				count = Integer.parseInt(countField.getText());
-			} catch (Exception ex) {
-				count = 0;
-			}
-		} else
-			count = 0;
+		
 		if (!center) {
 			// verifies that all entered values are valid options, then
 			// assigns value to the exterior temp variables
