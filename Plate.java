@@ -331,14 +331,18 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 					// ensures the red value is within acceptable range
 					if (red > 255) {
 						red = 255;
-						green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55);
+						green = (int) (((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55)/2);
+						if(green > 127.5){
+							green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+									* 2.55);
 						if (green > 255) {
 							green = 255;
-							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 300)
 									* 2.55);
 							if (blue > 255)
 								blue = 255;
 						}
+					}
 					}
 					if (red < 0) {
 						red = 0;
@@ -476,14 +480,18 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 					// ensures the red value is within acceptable range
 					if (red > 255) {
 						red = 255;
-						green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55);
+						green = (int) (((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55)/2);
+						if(green > 127.5){
+							green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+									* 2.55);
 						if (green > 255) {
 							green = 255;
-							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 300)
 									* 2.55);
 							if (blue > 255)
 								blue = 255;
 						}
+					}
 					}
 					if (red < 0) {
 						red = 0;
