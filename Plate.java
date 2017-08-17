@@ -8,17 +8,18 @@ import javax.swing.*;
 import demoPack.TempAdjust;
 
 public class Plate extends TempAdjust implements ActionListener, ItemListener {
-	// Private variables of the GUI components
+	// variables of the GUI components
 	JTextField tField, bField, lField, rField, dimRowField, dimRowPoint, dimColField, dimColPoint, countField,
-			countFieldPoint, tempField, xFieldPoint, yFieldPoint;
+			countFieldPoint, tempField, xFieldPoint, yFieldPoint, difFieldLR, difFieldTB;
 	JButton runButton;
-	int dRow, dCol, count, x, y, dRowPoint, dColPoint;
+	int dRow, dCol, count, x, y, dRowPoint, dColPoint, difLR, difTB;
 	String defaultTemp = "0";
 	boolean point = false;
 	BigDecimal[][] finalPlate;
 	JCheckBox countCheckBox = new JCheckBox("Use set number of runs", false);
 	JCheckBox checkBox = new JCheckBox("Use set number of runs", false);
 	JCheckBox xyCheckBox = new JCheckBox("Non-center point heat source", false);
+	JCheckBox difCheckBox = new JCheckBox("Diffuse heat source", false);
 	JComboBox cb;
 	JPanel cards; // a panel that uses CardLayout
 	final static String EDGEPANEL = "Card with Edge Heat";
@@ -26,6 +27,8 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 	JLabel center = new JLabel(" ");
 	JLabel xLabel = new JLabel(" ");
 	JLabel yLabel = new JLabel(" ");
+	JLabel difLabelLR = new JLabel(" ");
+	JLabel difLabelTB = new JLabel(" ");
 
 	public void addComponentToPane(Container pane) {
 		// Adds the JComboBox to choose which version of the interface to
@@ -90,7 +93,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		runButton.addActionListener(this);
 		// JPanel for point heat: Includes input locations for temp, dimensions,
 		// desired number of runs, and location of heat
-		JPanel pointPanel = new JPanel(new GridLayout(8, 2, 10, 2));
+		JPanel pointPanel = new JPanel(new GridLayout(11, 2, 10, 2));
 		sidesPanel.setBorder(BorderFactory.createTitledBorder("Input Plate Information: "));
 
 		// Top temp (Row 1)
@@ -138,7 +141,24 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		yFieldPoint.setEnabled(false);
 		pointPanel.add(yFieldPoint);
 
-		// Button to run simulation with given data (Row 8)
+		// Diffuse heat source (Row 8)
+		difCheckBox.addItemListener(this);
+		pointPanel.add(difCheckBox);
+		pointPanel.add(new JLabel(" "));
+
+		// length of top side of heat source (Row 9)
+		pointPanel.add(difLabelLR);
+		difFieldLR = new JTextField(10);
+		difFieldLR.setEnabled(false);
+		pointPanel.add(difFieldLR);
+
+		// length of left side of heat source (Row 10)
+		pointPanel.add(difLabelTB);
+		difFieldTB = new JTextField(10);
+		difFieldTB.setEnabled(false);
+		pointPanel.add(difFieldTB);
+
+		// Button to run simulation with given data (Row 11)
 		runButton = new JButton("Run");
 		pointPanel.add(runButton);
 		// if the actionListener is activated, opens a new JFrame with the
@@ -155,10 +175,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		pane.add(cards, BorderLayout.CENTER);
 	}
 
-	/**
-	 * Create the GUI and show it. For thread safety, this method should be
-	 * invoked from the event dispatch thread.
-	 */
+	// display GUI
 	private static void createAndShowGUI() {
 		// Create and set up the window.
 		JFrame frame = new JFrame("Heat Simulation");
@@ -174,14 +191,10 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		frame.setVisible(true);
 	}
 
-	/** The entry main() method */
+	// main method
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				createAndShowGUI();
-			}
-		});
+
+		createAndShowGUI();
 	}
 
 	// called when run button is pushed-calls methods in TempAdjust and actually
@@ -300,42 +313,42 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 			oldPlateSides = initializeSides(oldPlateSides, top, bot, left, right);
 			finalPlate = new BigDecimal[dRow + 2][dCol + 2];
 			finalPlate = initializeSides(newPlateSides, top, bot, left, right);
-			finalPlate = iterator(oldPlateSides, newPlateSides, count, point, 0, 0);
+			finalPlate = iterator(oldPlateSides, newPlateSides, count, point, 0, 0, 0, 0);
 
-			
 			// final display frame
 			grid.setLayout(new GridLayout(dRow, dCol));
-			// conditional accounts for the 2 added rows and columns used in edge
+			// conditional accounts for the 2 added rows and columns used in
+			// edge
 			// heat
 
-				for (int i = 1; i <= dRow; i++) {
-					for (int j = 1; j <= dCol; j++) {
-						pointData = new JLabel(finalPlate[i][j] + "\t");
-						blue = green = 0;
-						// sets the color gradient of the text based on the
-						// temperature (from black at 0 to red at 100+)
-						red = (int) (finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() * 2.55);
-						// ensures the red value is within acceptable range
-						if (red > 255) {
-							red = 255;
-							green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55);
-							if (green > 255) {
-								green = 255;
-								blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
-										* 2.55);
-								if (blue > 255)
-									blue = 255;
-							}
+			for (int i = 1; i <= dRow; i++) {
+				for (int j = 1; j <= dCol; j++) {
+					pointData = new JLabel(finalPlate[i][j] + "\t");
+					blue = green = 0;
+					// sets the color gradient of the text based on the
+					// temperature (from black at 0 to red at 100+)
+					red = (int) (finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() * 2.55);
+					// ensures the red value is within acceptable range
+					if (red > 255) {
+						red = 255;
+						green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55);
+						if (green > 255) {
+							green = 255;
+							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+									* 2.55);
+							if (blue > 255)
+								blue = 255;
 						}
-						if (red < 0) {
-							red = 0;
-						}
-
-						pointData.setForeground(new Color(red, green, blue));
-						grid.add(pointData);
+					}
+					if (red < 0) {
+						red = 0;
 					}
 
+					pointData.setForeground(new Color(red, green, blue));
+					grid.add(pointData);
 				}
+
+			}
 		}
 
 		// if it IS point heat, temp, heat location, and version count cases
@@ -371,64 +384,88 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 				}
 			} else
 				y = -1;
-		
 
-		// dimensions if blank or out of bounds
-		if (!dimRowPoint.getText().equals(""))
+			if (!difFieldLR.getText().equals("")) {
+				try {
+					difLR = Integer.parseInt(difFieldLR.getText());
+				} catch (Exception ex) {
+					difLR = 1;
+				}
+			} else
+				difLR = 1;
 
-		{
-			try {
-				dRowPoint = Integer.parseInt(dimRowPoint.getText());
-			} catch (Exception ex) {
+			if (!difFieldTB.getText().equals("")) {
+				try {
+					difTB = Integer.parseInt(difFieldTB.getText());
+				} catch (Exception ex) {
+					difTB = 1;
+				}
+			} else
+				difTB = 1;
+
+			// dimensions if blank or out of bounds
+			if (!dimRowPoint.getText().equals(""))
+
+			{
+				try {
+					dRowPoint = Integer.parseInt(dimRowPoint.getText());
+				} catch (Exception ex) {
+					dRowPoint = 3;
+				}
+			} else
+				dRowPoint = 3;
+			if (dRowPoint < 1) {
 				dRowPoint = 3;
 			}
-		} else
-			dRowPoint = 3;
-		if (dRowPoint < 1) {
-			dRowPoint = 3;
-		}
 
-		if (!dimColPoint.getText().equals("")) {
-			try {
-				dColPoint = Integer.parseInt(dimColPoint.getText());
-			} catch (Exception ex) {
+			if (!dimColPoint.getText().equals("")) {
+				try {
+					dColPoint = Integer.parseInt(dimColPoint.getText());
+				} catch (Exception ex) {
+					dColPoint = 3;
+				}
+			} else
+				dColPoint = 3;
+
+			if (dColPoint < 1) {
 				dColPoint = 3;
 			}
-		} else
-			dColPoint = 3;
 
-		if (dColPoint < 1) {
-			dColPoint = 3;
-		}
+			// makes a final plate for display purposes
+			// for point heat, assigns temp value and double checks location of
+			// heat
+			// source for issue
+			try {
+				temp = new BigDecimal(sTemp);
+			} catch (Exception ex) {
+				sTemp = defaultTemp;
+				temp = new BigDecimal(sTemp);
+			}
+			if (x < 0 || x >= dRowPoint)
+				x = dRowPoint / 2;
+			if (y < 0 || y >= dColPoint)
+				y = dColPoint / 2;
+			// checks size of heat source to ensure it exists
+			if (difLR < 1)
+				difLR = 1;
+			if (difTB < 1)
+				difTB = 1;
+			// creates the plates
+			BigDecimal[][] oldPlatePoint = new BigDecimal[dRowPoint][dColPoint];
+			BigDecimal[][] newPlatePoint = new BigDecimal[dRowPoint][dColPoint];
+			// sets edge temperatures for plates
+			oldPlatePoint = initializePoint(oldPlatePoint, temp, y, x, difLR, difTB);
+			// final plate for display purposes
+			finalPlate = new BigDecimal[dRowPoint][dColPoint];
+			finalPlate = initializePoint(newPlatePoint, temp, y, x, difLR, difTB);
+			finalPlate = iterator(oldPlatePoint, newPlatePoint, count, point, x, y, difLR, difTB);
 
-		// makes a final plate for display purposes
-		// for point heat, assigns temp value and double checks location of heat
-		// source for issue
-		try {
-			temp = new BigDecimal(sTemp);
-		} catch (Exception ex) {
-			sTemp = defaultTemp;
-			temp = new BigDecimal(sTemp);
-		}
-		if (x < 0 || x >= dRowPoint)
-			x = dRowPoint / 2;
-		if (y < 0 || y >= dColPoint)
-			y = dColPoint / 2;
-		// creates the plates
-		BigDecimal[][] oldPlatePoint = new BigDecimal[dRowPoint][dColPoint];
-		BigDecimal[][] newPlatePoint = new BigDecimal[dRowPoint][dColPoint];
-		// sets edge temperatures for plates
-		oldPlatePoint = initializePoint(oldPlatePoint, temp, x, y);
-		// final plate for display purposes
-		finalPlate = new BigDecimal[dRowPoint][dColPoint];
-		finalPlate = initializePoint(newPlatePoint, temp, x, y);
-		finalPlate = iterator(oldPlatePoint, newPlatePoint, count, point, x, y);
-
-		// final display frame
+			// final display frame
 			grid.setLayout(new GridLayout(dRowPoint, dColPoint));
-					// conditional accounts for the 2 added rows and columns used in edge
-					// heat
-		
+			// conditional accounts for the 2 added rows and columns used in
+			// edge
+			// heat
+
 			for (int i = 0; i < dRowPoint; i++) {
 				for (int j = 0; j < dColPoint; j++) {
 					blue = green = 0;
@@ -440,22 +477,24 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 					if (red > 255) {
 						red = 255;
 						green = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 100) * 2.55);
-						if (green > 255)
+						if (green > 255) {
 							green = 255;
-						blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200) * 2.55);
-						if (blue > 255)
-							blue = 255;
+							blue = (int) ((finalPlate[i][j].setScale(0, RoundingMode.DOWN).intValueExact() - 200)
+									* 2.55);
+							if (blue > 255)
+								blue = 255;
+						}
 					}
 					if (red < 0) {
 						red = 0;
 					}
 
-					pointData.setForeground(new Color(red, green, 0));
+					pointData.setForeground(new Color(red, green, blue));
 					grid.add(pointData);
 				}
 			}
 
-	}
+		}
 		frame.setContentPane(grid);
 		frame.getContentPane().setBackground(Color.lightGray);
 		frame.pack();
@@ -474,40 +513,68 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 			cl.show(cards, (String) evt.getItem());
 			if (cb.getSelectedIndex() == 0) {
 				point = false;
-			} else
+				dimRowPoint.setText("");
+				dimColPoint.setText("");
+				tempField.setText("");
+				checkBox.setSelected(false);
+				xyCheckBox.setSelected(false);
+				difCheckBox.setSelected(false);
+			} else {
 				point = true;
+				tField.setText("");
+				bField.setText("");
+				lField.setText("");
+				rField.setText("");
+				dimRowField.setText("");
+				dimColField.setText("");
+				countCheckBox.setSelected(false);
+			}
 		}
 		// checks/unchecks number of runs checkbox on point
 		// heat-enables/disables text box
 		else if (evt.getSource() == checkBox) {
 			if (evt.getStateChange() == ItemEvent.SELECTED) {
 				countFieldPoint.setEnabled(true);
-
 			} else if (evt.getStateChange() == ItemEvent.DESELECTED) {
 				countFieldPoint.setEnabled(false);
 				countFieldPoint.setText("");
 			}
-
 			validate();
 			repaint();
 		}
 		// checks/unchecks number of runs checkbox on edge heat-enables/disables
 		// text box
 		else if (evt.getSource() == countCheckBox) {
-
 			if (evt.getStateChange() == ItemEvent.SELECTED) {
 				countField.setEnabled(true);
-
 			} else if (evt.getStateChange() == ItemEvent.DESELECTED) {
 				countField.setEnabled(false);
 				countField.setText("");
 			}
-
 			validate();
 			repaint();
 		}
-		// checks/unchecks non-center heat checkbox on point
-		// heat-enables/disables text boxes
+		// checks/unchecks diffuse heat checkbox
+		// henables/disables text boxes and associated labels
+		else if (evt.getSource() == difCheckBox) {
+			if (evt.getStateChange() == ItemEvent.SELECTED) {
+				difFieldLR.setEnabled(true);
+				difFieldTB.setEnabled(true);
+				difLabelLR.setText("Enter length of left side");
+				difLabelTB.setText("Enter length of top side");
+			} else if (evt.getStateChange() == ItemEvent.DESELECTED) {
+				difFieldLR.setEnabled(false);
+				difFieldTB.setEnabled(false);
+				difFieldLR.setText("");
+				difFieldTB.setText("");
+				difLabelLR.setText(" ");
+				difLabelTB.setText(" ");
+			}
+			validate();
+			repaint();
+		}
+		// checks/unchecks non-center heat checkbox
+		// enables/disables text boxes and associated labels
 		else {
 			if (evt.getStateChange() == ItemEvent.SELECTED) {
 				xFieldPoint.setEnabled(true);
