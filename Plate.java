@@ -29,6 +29,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 	JLabel yLabel = new JLabel(" ");
 	JLabel difLabelLR = new JLabel(" ");
 	JLabel difLabelTB = new JLabel(" ");
+	JLabel diffuse = newJLabel(" ");
 
 	public void addComponentToPane(Container pane) {
 		// Adds the JComboBox to choose which version of the interface to
@@ -144,7 +145,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 		// Diffuse heat source (Row 8)
 		difCheckBox.addItemListener(this);
 		pointPanel.add(difCheckBox);
-		pointPanel.add(new JLabel(" "));
+		pointPanel.add(diffuse);
 
 		// length of top side of heat source (Row 9)
 		pointPanel.add(difLabelLR);
@@ -570,6 +571,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 				difFieldTB.setEnabled(true);
 				difLabelLR.setText("Enter length of left side");
 				difLabelTB.setText("Enter length of top side");
+				diffuse.setText("Even entires will center up and left");
 			} else if (evt.getStateChange() == ItemEvent.DESELECTED) {
 				difFieldLR.setEnabled(false);
 				difFieldTB.setEnabled(false);
@@ -577,6 +579,7 @@ public class Plate extends TempAdjust implements ActionListener, ItemListener {
 				difFieldTB.setText("");
 				difLabelLR.setText(" ");
 				difLabelTB.setText(" ");
+				diffuse.setText(" ");
 			}
 			validate();
 			repaint();
