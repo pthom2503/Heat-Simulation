@@ -10,8 +10,13 @@ public class TempAdjust extends JFrame {
 	// temperature change
 	// returns 2D BigDecimal array of final heat distribution
 	public static BigDecimal[][] iterator(BigDecimal[][] oldPlate, BigDecimal[][] newPlate, int count, boolean point,
-			int x, int y) {
+			int x, int y, int difLR, int difTB) {
 		int runs = 0;
+		int dL = (int)Math.ceil((difLR)/2);
+		int dR = (int)Math.floor((difLR-1)/2);
+		int dT = (int)Math.ceil((difTB)/2);
+		int dB = (int)Math.floor((difTB-1)/2);
+		boolean dif = false;
 		BigDecimal two = new BigDecimal("2");
 		BigDecimal three = new BigDecimal("3");
 		BigDecimal four = new BigDecimal("4");
@@ -50,9 +55,16 @@ public class TempAdjust extends JFrame {
 				for (int i = 0; i < oldPlate.length; i++) {
 					for (int j = 0; j < oldPlate[i].length; j++) {
 						// don't adjust if it is the heat source
-						if (i == x && j == y) {
-							// sides cases
-						} else {
+						for(int k = x - dL; k <= x + dR; k++){
+							for(int m = y - dT; m <= y + dB; m++){
+								if(i == k && j == m){
+									dif = true;
+								}
+							}
+						}
+						
+						// sides cases
+						if(!dif) {
 							if (i == 0 && j != 0 && j != oldPlate[0].length - 1) {
 								newPlate[i][j] = (oldPlate[i + 1][j].add(oldPlate[i][j + 1]).add(oldPlate[i][j - 1]))
 										.divide(three, 2, RoundingMode.HALF_UP);
@@ -88,6 +100,7 @@ public class TempAdjust extends JFrame {
 								newPlate[i][j] = newPlate[i][j].setScale(2, RoundingMode.HALF_UP);
 							}
 						}
+						dif = false;
 					}
 				}
 			}
@@ -153,7 +166,11 @@ public class TempAdjust extends JFrame {
 
 	}
 
-	public static BigDecimal[][] initializePoint(BigDecimal[][] plate, BigDecimal temp, int x, int y) {
+	public static BigDecimal[][] initializePoint(BigDecimal[][] plate, BigDecimal temp, int x, int y, int difLR, int difTB) {
+		int dL = (int)Math.ceil((difLR)/2);
+		int dR = (int)Math.floor((difLR-1)/2);
+		int dT = (int)Math.ceil((difTB)/2);
+		int dB = (int)Math.floor((difTB-1)/2);
 		BigDecimal two = new BigDecimal("2");
 		two = two.setScale(2, RoundingMode.HALF_UP);
 
@@ -166,8 +183,18 @@ public class TempAdjust extends JFrame {
 		}
 		// sets the point heat source to the specified temp
 
-		plate[x][y] = temp;
-		plate[x][y] = plate[x][y].setScale(2, RoundingMode.HALF_UP);
+		for(int i = x - dL; i <= x + dR; i++){
+			for(int j = y - dT; j <= y + dB; j++){
+				if(i < 0 || j < 0 || i >= plate.length || j >=plate[0].length){
+				}
+				else{
+				plate[i][j] = temp;
+				plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
+				}
+				}
+			}
+		
+		
 		return plate;
 
 	}
@@ -180,7 +207,7 @@ public class TempAdjust extends JFrame {
 		boolean isDone = true;
 		if (count != 0) {
 			if (runs != count) {
-				isDone = false;			
+				isDone = false;
 			}
 		} else if (runs <= 1) {
 			isDone = false;
