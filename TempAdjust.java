@@ -184,12 +184,11 @@ public class TempAdjust extends JFrame {
 		}
 		// sets the point heat source to the specified temp
 
-		for (int i = x - dL; i <= x + dR; i++) {
-			for (int j = y - dT; j <= y + dB; j++) {
-				if (i < 0 || j < 0 || i >= plate.length || j >= plate[0].length) {
-				} else {
-					plate[i][j] = temp;
-					plate[i][j] = plate[i][j].setScale(2, RoundingMode.HALF_UP);
+		for (int k = x - dL; k <= x + dR; k++) {
+			for (int m = y - dT; m <= y + dB; m++) {
+				if (k >= 0 && m >= 0 && k < plate.length && m < plate[0].length) {
+					plate[k][m] = temp;
+					plate[k][m] = plate[k][m].setScale(2, RoundingMode.HALF_UP);
 				}
 			}
 		}
